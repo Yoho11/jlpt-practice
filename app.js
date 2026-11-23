@@ -173,7 +173,7 @@
       if (parts[2] === "review") return renderTest(ex, { review: true, focus: parts[3] });
       return renderTest(ex, {});
     }
-    if (parts[0] === "drill" && (parts[1] === "N2" || parts[1] === "N3") && (QTYPES[parts[2]] || parts[2] === "mistakes")) return renderDrill(parts[1], parts[2]);
+    if (parts[0] === "drill" && (parts[1] === "N2" || parts[1] === "N3") && QTYPES[parts[2]]) return renderDrill(parts[1], parts[2]);
     const level = parts[0] === "N3" ? "N3" : parts[0] === "N2" ? "N2" : store.get("jlpt:level", "N2");
     const view = parts[0] ? (parts[1] === "types" ? "types" : "tests") : store.get("jlpt:homeview", "tests");
     renderHome(level, view);
@@ -286,29 +286,6 @@
   const drillKey = (level, type) => `jlpt:drill:${level}:${type}`;
   const drillStats = (level, type) => store.get(drillKey(level, type), { sessions: [], missed: [] });
 
-  // "My mistakes": every drillable question you got wrong, either in a submitted full test or in a
-  // by-type drill, minus the ones you have since answered correctly in the mistakes drill.
-  const MISTAKES = { ja: "間違い復習", en: "My mistakes", cat: "mistakes" };
-  const fixedKey = (level) => `jlpt:mistakes:${level}`;
-  const fixedSet = (level) => new Set(store.get(fixedKey(level), []));
-  function mistakesPool(level) {
-    const types = Object.keys(QTYPES).filter((t) => QTYPES[t].cat !== "listening");
-    const all = new Map();
-    for (const t of types) for (const it of drillPool(level, t)) all.set(it.uid, it);
-    const wrong = new Set();
-    for (const t of types) drillStats(level, t).missed.forEach((u) => wrong.add(u));
-    for (const ex of window.EXAMS.filter((e) => e.level === level)) {
-      const st = loadState(ex.id);
-      if (!st || !st.submitted) continue;
-      for (const q of ex.questions) {
-        const a = st.answers[q.id];
-        if (q.answer != null && a != null && a !== q.answer) wrong.add(`${ex.id}|${q.id}`);
-      }
-    }
-    const fixed = fixedSet(level);
-    return [...wrong].filter((u) => all.has(u) && !fixed.has(u)).map((u) => all.get(u));
-  }
-
   function renderTypes(level) {
     const types = Object.keys(QTYPES).filter((t) => QTYPES[t].cat !== "listening");
     const groups = ["vocab", "grammar", "reading"].map((cat) => {
@@ -327,11 +304,6 @@
       }).join("");
       return rows ? `<section class="type-group"><h2 class="jp"><span class="cat ${cat}">${CAT[cat].label}</span> ${CAT[cat].en}</h2><div class="type-grid">${rows}</div></section>` : "";
     }).join("");
-    const mp = mistakesPool(level);
-    const mCard = mp.length ? `<section class="type-group"><div class="type-grid"><a class="type-card mistakes" href="#/drill/${level}/mistakes">
-          <div class="tc-top"><b class="jp">${MISTAKES.ja}</b><span class="muted">${MISTAKES.en}</span></div>
-          <div class="tc-meta"><span class="chip warn">${mp.length} to review</span><span class="chip">${new Set(mp.map((p) => p.q.type)).size} question types</span></div>
-          <div class="muted small-hint">Everything you got wrong in tests and drills. Answer one correctly and it leaves the list.</div></a></div></section>` : "";
     $app.innerHTML = `${topbar()}
       <main class="home">
         <section class="hero">
@@ -339,7 +311,6 @@
           <p>Drill one kind of question at a time, pulled from every ${level} paper. You see whether you're right as soon as you answer. Listening isn't included here because those questions need the full recording; practise them in the full tests.</p>
         </section>
         ${homeTabs(level, "types")}
-        ${mCard}
         ${groups}
       </main>`;
   }
@@ -358,9 +329,8 @@
   }
 
   function renderDrill(level, type) {
-    const mistakesMode = type === "mistakes";
-    const tl = mistakesMode ? MISTAKES : QTYPES[type];
-    const pool = mistakesMode ? mistakesPool(level) : drillPool(level, type);
+    const tl = QTYPES[type];
+    const pool = drillPool(level, type);
     document.title = `${tl.ja} · ${level} practice`;
     let stats = drillStats(level, type);
     let phase = "setup", items = [], i = 0, picks = {}, count = store.get("jlpt:drillcount", 10), onlyMissed = false;
@@ -371,14 +341,14 @@
     function setup() {
       phase = "setup";
       stats = drillStats(level, type);
-      const missed = mistakesMode ? [] : pool.filter((p) => stats.missed.includes(p.uid));
+      const missed = pool.filter((p) => stats.missed.includes(p.uid));
       const hist = stats.sessions.slice(-5).reverse().map((s) => { const p = Math.round((s.c / s.n) * 100); return `<li><span>${new Date(s.date).toLocaleDateString()}</span><b style="color:${pctColor(p)}">${p}%</b><span class="muted">${s.c}/${s.n}</span></li>`; }).join("");
       $app.innerHTML = shell(`
         <section class="card drill-setup">
           ${back}
-          <div class="ds-head">${mistakesMode ? "" : `<span class="cat ${tl.cat} jp">${CAT[tl.cat].label}</span>`}<span class="level-badge">${level}</span></div>
+          <div class="ds-head"><span class="cat ${tl.cat} jp">${CAT[tl.cat].label}</span><span class="level-badge">${level}</span></div>
           <h1 class="jp">${esc(tl.ja)}</h1>
-          <p class="muted">${esc(tl.en)} · ${pool.length} questions from ${new Set(pool.map((p) => p.ex.id)).size} past papers${mistakesMode ? ". A question leaves this list when you answer it correctly." : ""}</p>
+          <p class="muted">${esc(tl.en)} · ${pool.length} questions from ${new Set(pool.map((p) => p.ex.id)).size} past papers</p>
           <div class="ds-row"><span class="ds-label">Questions</span>
             <div class="seg">${[10, 20, 0].map((n) => `<button class="${count === n ? "active" : ""}" data-count="${n}">${n || `All ${pool.length}`}</button>`).join("")}</div></div>
           ${missed.length ? `<label class="ds-check"><input type="checkbox" data-missed ${onlyMissed ? "checked" : ""}/> Only questions I got wrong before <span class="chip warn">${missed.length}</span></label>` : ""}
@@ -419,7 +389,7 @@
         <div class="q-layout ${passage ? "with-passage" : ""}">
           ${passage}
           <section class="q-card">
-            <div class="q-meta"><span class="cat ${q.cat} jp">${CAT[q.cat].label}</span><span class="q-type jp">${esc(QTYPES[q.type].ja)}<small>${esc(QTYPES[q.type].en)}</small></span><span class="spacer"></span><span class="q-count">${esc(src)}</span></div>
+            <div class="q-meta"><span class="cat ${q.cat} jp">${CAT[q.cat].label}</span><span class="q-type jp">${esc(tl.ja)}<small>${esc(tl.en)}</small></span><span class="spacer"></span><span class="q-count">${esc(src)}</span></div>
             ${t.prompt ? `<div class="q-prompt jp ${isUsage ? "usage" : ""}" style="margin-top:14px">${t.prompt}</div>` : `<div class="q-prompt" style="margin-top:14px">Fill blank <span class="blank cur">${q.num}</span> in the text.</div>`}
             ${isUsage ? '<p class="muted small-hint">Choose the sentence where the word is used correctly.</p>' : ""}
             <div class="choices">${choices}</div>
@@ -437,15 +407,10 @@
       if (phase !== "q" || picks[i] != null || n > items[i].q.text.choices.length) return;
       picks[i] = n;
       // keep a running list of questions to review
-      const qt = items[i].q.type, s = drillStats(level, qt), uid = items[i].uid;
+      const s = drillStats(level, type), uid = items[i].uid;
       const set = new Set(s.missed);
       if (n === items[i].q.answer) set.delete(uid); else set.add(uid);
-      s.missed = [...set]; store.set(drillKey(level, qt), s);
-      if (mistakesMode) {
-        const fx = fixedSet(level);
-        if (n === items[i].q.answer) fx.add(uid); else fx.delete(uid);
-        store.set(fixedKey(level), [...fx]);
-      }
+      s.missed = [...set]; store.set(drillKey(level, type), s);
       question();
     }
     function next() {
@@ -511,11 +476,6 @@
     });
     if (!ok) return;
     st.submitted = true; st.submittedAt = Date.now(); saveState(ex.id, st);
-    { // a question you get wrong again in a test is back on the "My mistakes" list
-      const fx = fixedSet(ex.level); let ch = false;
-      for (const q of ex.questions) if (q.answer != null && st.answers[q.id] != null && st.answers[q.id] !== q.answer && fx.delete(`${ex.id}|${q.id}`)) ch = true;
-      if (ch) store.set(fixedKey(ex.level), [...fx]);
-    }
     const r = score(ex, st.answers);
     const hist = store.get(histKey(ex.id), []);
     const j = jlptScore(ex, st.answers);
