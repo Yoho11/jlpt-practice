@@ -284,7 +284,16 @@
       .map((q) => ({ ex, q, uid: `${ex.id}|${q.id}` })));
   }
   const drillKey = (level, type) => `jlpt:drill:${level}:${type}`;
-  const drillStats = (level, type) => store.get(drillKey(level, type), { sessions: [], missed: [] });
+  const drillStats = (level, type) => store.get(drillKey(level, type), { sessions: [], missed: [], seen: [] });
+  // questions you have already answered, in a by-type drill or in any attempt at a full test
+  function seenSet(level, type) {
+    const seen = new Set(drillStats(level, type).seen || []);
+    for (const ex of window.EXAMS.filter((e) => e.level === level)) {
+      const st = loadState(ex.id);
+      if (st) for (const id of Object.keys(st.answers)) if (st.answers[id] != null) seen.add(`${ex.id}|${id}`);
+    }
+    return seen;
+  }
 
   function renderTypes(level) {
     const types = Object.keys(QTYPES).filter((t) => QTYPES[t].cat !== "listening");
@@ -304,6 +313,12 @@
       }).join("");
       return rows ? `<section class="type-group"><h2 class="jp"><span class="cat ${cat}">${CAT[cat].label}</span> ${CAT[cat].en}</h2><div class="type-grid">${rows}</div></section>` : "";
     }).join("");
+    const runs = types.flatMap((t) => drillStats(level, t).sessions.map((x) => ({ ...x, t }))).sort((a, b) => b.date - a.date);
+    const histRows = runs.slice(0, 60).map((x) => {
+      const p = Math.round((x.c / x.n) * 100);
+      return `<li><a class="hist-row" href="#/drill/${level}/${x.t}"><span class="muted hr-date">${new Date(x.date).toLocaleDateString()} ${new Date(x.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span><span class="hr-type jp">${esc(QTYPES[x.t].ja)} <small class="muted">${esc(QTYPES[x.t].en)}</small></span><b style="color:${pctColor(p)}">${p}%</b><span class="muted">${x.c}/${x.n}</span></a></li>`;
+    }).join("");
+    const histSection = runs.length ? `<details class="card practice-history"><summary>Practice history <span class="chip">${runs.length}</span> <span class="muted">latest first</span></summary><ul class="hist-list">${histRows}</ul></details>` : "";
     $app.innerHTML = `${topbar()}
       <main class="home">
         <section class="hero">
@@ -311,6 +326,7 @@
           <p>Drill one kind of question at a time, pulled from every ${level} paper. You see whether you're right as soon as you answer. Listening isn't included here because those questions need the full recording; practise them in the full tests.</p>
         </section>
         ${homeTabs(level, "types")}
+        ${histSection}
         ${groups}
       </main>`;
   }
@@ -342,13 +358,14 @@
       phase = "setup";
       stats = drillStats(level, type);
       const missed = pool.filter((p) => stats.missed.includes(p.uid));
+      const seenNow = seenSet(level, type), unseenCount = pool.filter((p) => !seenNow.has(p.uid)).length;
       const hist = stats.sessions.slice(-5).reverse().map((s) => { const p = Math.round((s.c / s.n) * 100); return `<li><span>${new Date(s.date).toLocaleDateString()}</span><b style="color:${pctColor(p)}">${p}%</b><span class="muted">${s.c}/${s.n}</span></li>`; }).join("");
       $app.innerHTML = shell(`
         <section class="card drill-setup">
           ${back}
           <div class="ds-head"><span class="cat ${tl.cat} jp">${CAT[tl.cat].label}</span><span class="level-badge">${level}</span></div>
           <h1 class="jp">${esc(tl.ja)}</h1>
-          <p class="muted">${esc(tl.en)} · ${pool.length} questions from ${new Set(pool.map((p) => p.ex.id)).size} past papers</p>
+          <p class="muted">${esc(tl.en)} · ${pool.length} questions from ${new Set(pool.map((p) => p.ex.id)).size} past papers · ${unseenCount} not seen yet</p>
           <div class="ds-row"><span class="ds-label">Questions</span>
             <div class="seg">${[10, 20, 0].map((n) => `<button class="${count === n ? "active" : ""}" data-count="${n}">${n || `All ${pool.length}`}</button>`).join("")}</div></div>
           ${missed.length ? `<label class="ds-check"><input type="checkbox" data-missed ${onlyMissed ? "checked" : ""}/> Only questions I got wrong before <span class="chip warn">${missed.length}</span></label>` : ""}
@@ -361,7 +378,9 @@
     }
 
     function start(from) {
-      items = shuffle(from);
+      // new questions first (never answered in a drill or a full test), then the ones you have seen
+      const seen = seenSet(level, type);
+      items = onlyMissed ? shuffle(from) : [...shuffle(from.filter((p) => !seen.has(p.uid))), ...shuffle(from.filter((p) => seen.has(p.uid)))];
       if (count && !onlyMissed) items = items.slice(0, count);
       i = 0; picks = {}; phase = "q"; question();
     }
@@ -395,7 +414,7 @@
             <div class="choices">${choices}</div>
             ${feedback}
             ${answered && t.explain ? `<details class="explain" open><summary>Explanation</summary><div class="explain-body jp">${t.explain}</div></details>` : ""}
-            <div class="q-foot"><span class="muted kbd-hint">${answered ? "<kbd>Enter</kbd> next" : "<kbd>1</kbd>–<kbd>4</kbd> answer"}</span>
+            <div class="q-foot">${i > 0 ? `<button class="btn ghost" data-prev>← Back</button>` : ""}<span class="muted kbd-hint">${i > 0 ? "<kbd>←</kbd> back · " : ""}${answered ? "<kbd>Enter</kbd> next" : "<kbd>1</kbd>–<kbd>4</kbd> answer"}</span>
               ${answered ? `<button class="btn" data-next>${i === items.length - 1 ? "See results" : "Next →"}</button>` : ""}</div>
           </section>
         </div>`);
@@ -410,8 +429,14 @@
       const s = drillStats(level, type), uid = items[i].uid;
       const set = new Set(s.missed);
       if (n === items[i].q.answer) set.delete(uid); else set.add(uid);
-      s.missed = [...set]; store.set(drillKey(level, type), s);
+      s.missed = [...set];
+      s.seen = [...new Set([...(s.seen || []), uid])];
+      store.set(drillKey(level, type), s);
       question();
+    }
+    function prev() {
+      if (phase !== "q" || i === 0) return;
+      i--; question();
     }
     function next() {
       if (phase !== "q" || picks[i] == null) return;
@@ -453,11 +478,13 @@
     const onClick = (e) => {
       const c = e.target.closest(".choice"); if (c && !c.disabled) return pick(Number(c.dataset.c));
       if (e.target.closest("[data-next]")) next();
+      else if (e.target.closest("[data-prev]")) prev();
     };
     const onKey = (e) => {
       if (e.metaKey || e.ctrlKey || e.altKey || e.target.matches?.("input")) return;
       if (/^[1-4]$/.test(e.key)) pick(Number(e.key));
       else if (e.key === "Enter" || e.key === "ArrowRight") { if (phase === "q") { e.preventDefault(); next(); } }
+      else if (e.key === "ArrowLeft") { if (phase === "q") { e.preventDefault(); prev(); } }
     };
     $app.addEventListener("click", onClick);
     document.addEventListener("keydown", onKey);

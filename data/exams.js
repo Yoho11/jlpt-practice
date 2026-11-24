@@ -347,6 +347,23 @@ window.EXAMS = [
       ]
     ),
   },
+  {
+    id: "n2-2012-07", level: "N2", year: 2012, month: 7, pages: 17, listeningPage: 16,
+    notes: [],
+    parts: N2_PARTS(
+      [
+        [1, "41413", "vocab"], [2, "23424", "vocab"], [3, "33441", "vocab"], [4, "2433121", "vocab"],
+        [5, "21342", "vocab"], [6, "23121", "vocab"],
+        [7, "123121424334", "grammar"], [8, "31422", "grammar"], [9, "44312", "grammar"],
+        [10, "24323", "reading"], [11, "112214443", "reading"], [12, "34", "reading"],
+        [13, "113", "reading"], [14, "23", "reading"],
+      ],
+      [
+        [1, "32414", "listening"], [2, "333321", "listening"], [3, "33311", "listening"],
+        [4, "12123331233", "listening"], [5, "3431", "listening"],
+      ]
+    ),
+  },
 
   // ───────────────────────── N3 ─────────────────────────
   {

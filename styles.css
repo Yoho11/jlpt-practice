@@ -519,5 +519,13 @@ kbd { font: 11px/1 ui-monospace, monospace; padding: 2px 5px; border: 1px solid 
 @media (max-width: 700px) {
   .drill .q-foot { margin: 22px -16px -16px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
   .drill .kbd-hint { display: none; }
-  .drill .q-foot .btn { width: 100%; justify-content: center; }
+  .drill .q-foot .btn { flex: 1; justify-content: center; }
 }
+
+/* practice history on the by-type page */
+.practice-history { margin: 0 0 18px; padding: 12px 16px; }
+.practice-history summary { cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.hist-list { list-style: none; margin: 10px 0 0; padding: 0; max-height: 360px; overflow: auto; }
+.hist-row { display: grid; grid-template-columns: 9.5em 1fr auto auto; gap: 10px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--border); color: inherit; text-decoration: none; }
+.hist-row:hover .hr-type { color: var(--accent); }
+@media (max-width: 520px) { .hist-row { grid-template-columns: 1fr auto auto; } .hr-date { grid-column: 1 / -1; font-size: 12px; } }
