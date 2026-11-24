@@ -529,3 +529,9 @@ kbd { font: 11px/1 ui-monospace, monospace; padding: 2px 5px; border: 1px solid 
 .hist-row { display: grid; grid-template-columns: 9.5em 1fr auto auto; gap: 10px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--border); color: inherit; text-decoration: none; }
 .hist-row:hover .hr-type { color: var(--accent); }
 @media (max-width: 520px) { .hist-row { grid-template-columns: 1fr auto auto; } .hr-date { grid-column: 1 / -1; font-size: 12px; } }
+
+/* custom question count in the drill setup */
+.ds-custom { display: inline-flex; align-items: center; gap: 8px; margin-left: 12px; color: var(--muted); font-size: 13px; }
+.ds-custom input { width: 5.5em; padding: 7px 10px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; }
+.ds-custom.active input { border-color: var(--accent); }
+@media (max-width: 520px) { .ds-custom { margin-left: 0; } }

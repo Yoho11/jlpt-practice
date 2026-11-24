@@ -367,12 +367,22 @@
           <h1 class="jp">${esc(tl.ja)}</h1>
           <p class="muted">${esc(tl.en)} · ${pool.length} questions from ${new Set(pool.map((p) => p.ex.id)).size} past papers · ${unseenCount} not seen yet</p>
           <div class="ds-row"><span class="ds-label">Questions</span>
-            <div class="seg">${[10, 20, 0].map((n) => `<button class="${count === n ? "active" : ""}" data-count="${n}">${n || `All ${pool.length}`}</button>`).join("")}</div></div>
+            <div class="seg">${[10, 0].map((n) => `<button class="${count === n ? "active" : ""}" data-count="${n}">${n || `All ${pool.length}`}</button>`).join("")}</div>
+            <label class="ds-custom ${[10, 0].includes(count) ? "" : "active"}">or <input type="number" inputmode="numeric" min="1" max="${pool.length}" placeholder="custom" data-custom value="${[10, 0].includes(count) ? "" : count}" aria-label="Custom number of questions" /></label></div>
           ${missed.length ? `<label class="ds-check"><input type="checkbox" data-missed ${onlyMissed ? "checked" : ""}/> Only questions I got wrong before <span class="chip warn">${missed.length}</span></label>` : ""}
           <button class="btn big" data-start>Start practice</button>
           ${hist ? `<div class="ds-hist"><h3>Recent sessions</h3><ul>${hist}</ul></div>` : ""}
         </section>`);
       $app.querySelectorAll("[data-count]").forEach((b) => b.addEventListener("click", () => { count = Number(b.dataset.count); store.set("jlpt:drillcount", count); setup(); }));
+      const cu = $app.querySelector("[data-custom]");
+      cu.addEventListener("input", () => {
+        const n = Math.floor(Number(cu.value));
+        if (!(n >= 1)) { cu.parentElement.classList.remove("active"); return; }
+        count = Math.min(n, pool.length); store.set("jlpt:drillcount", count);
+        $app.querySelectorAll("[data-count]").forEach((b) => b.classList.toggle("active", Number(b.dataset.count) === count));
+        cu.parentElement.classList.toggle("active", ![10, 0].includes(count));
+        if (n > pool.length) cu.value = pool.length;
+      });
       const mc = $app.querySelector("[data-missed]"); if (mc) mc.addEventListener("change", () => { onlyMissed = mc.checked; });
       $app.querySelector("[data-start]").addEventListener("click", () => start(onlyMissed ? missed : pool));
     }
