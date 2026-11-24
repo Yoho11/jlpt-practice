@@ -279,6 +279,74 @@ window.EXAMS = [
       ]
     ),
   },
+  {
+    id: "n2-2013-07", level: "N2", year: 2013, month: 7, pages: 17, listeningPage: 15,
+    notes: [],
+    parts: N2_PARTS(
+      [
+        [1, "13244", "vocab"], [2, "43111", "vocab"], [3, "42314", "vocab"], [4, "2122434", "vocab"],
+        [5, "22311", "vocab"], [6, "43334", "vocab"],
+        [7, "134214321423", "grammar"], [8, "12342", "grammar"], [9, "31432", "grammar"],
+        [10, "12422", "reading"], [11, "432443122", "reading"], [12, "34", "reading"],
+        [13, "113", "reading"], [14, "31", "reading"],
+      ],
+      [
+        [1, "22333", "listening"], [2, "34342", "listening"], [3, "32414", "listening"],
+        [4, "132131131112", "listening"], [5, "3212", "listening"],
+      ]
+    ),
+  },
+  {
+    id: "n2-2012-12", level: "N2", year: 2012, month: 12, pages: 17, listeningPage: 16,
+    notes: [],
+    parts: N2_PARTS(
+      [
+        [1, "13214", "vocab"], [2, "43231", "vocab"], [3, "42142", "vocab"], [4, "3312341", "vocab"],
+        [5, "14424", "vocab"], [6, "32132", "vocab"],
+        [7, "142424113213", "grammar"], [8, "13213", "grammar"], [9, "23134", "grammar"],
+        [10, "23144", "reading"], [11, "413214132", "reading"], [12, "21", "reading"],
+        [13, "213", "reading"], [14, "43", "reading"],
+      ],
+      [
+        [1, "42132", "listening"], [2, "342133", "listening"], [3, "4133", "listening"],
+        [4, "213212113123", "listening"], [5, "3314", "listening"],
+      ]
+    ),
+  },
+  {
+    id: "n2-2011-12", level: "N2", year: 2011, month: 12, pages: 17, listeningPage: 16,
+    notes: [],
+    parts: N2_PARTS(
+      [
+        [1, "43343", "vocab"], [2, "12422", "vocab"], [3, "12443", "vocab"], [4, "1413233", "vocab"],
+        [5, "14123", "vocab"], [6, "41423", "vocab"],
+        [7, "214232321423", "grammar"], [8, "44131", "grammar"], [9, "14323", "grammar"],
+        [10, "31414", "reading"], [11, "224412331", "reading"], [12, "43", "reading"],
+        [13, "422", "reading"], [14, "33", "reading"],
+      ],
+      [
+        [1, "23432", "listening"], [2, "231342", "listening"], [3, "33214", "listening"],
+        [4, "23213232123", "listening"], [5, "1414", "listening"],
+      ]
+    ),
+  },
+  {
+    id: "n2-2011-07", level: "N2", year: 2011, month: 7, pages: 17, listeningPage: 16,
+    notes: [],
+    parts: N2_PARTS(
+      [
+        [1, "23143", "vocab"], [2, "32142", "vocab"], [3, "12142", "vocab"], [4, "4412112", "vocab"],
+        [5, "34133", "vocab"], [6, "43324", "vocab"],
+        [7, "324413331221", "grammar"], [8, "21433", "grammar"], [9, "24131", "grammar"],
+        [10, "32212", "reading"], [11, "344314321", "reading"], [12, "13", "reading"],
+        [13, "144", "reading"], [14, "41", "reading"],
+      ],
+      [
+        [1, "23321", "listening"], [2, "234232", "listening"], [3, "14312", "listening"],
+        [4, "31311332312", "listening"], [5, "3413", "listening"],
+      ]
+    ),
+  },
 
   // ───────────────────────── N3 ─────────────────────────
   {
@@ -554,6 +622,78 @@ window.EXAMS = [
       [
         [1, "324334", "listening"], [2, "322343", "listening"], [3, "123", "listening"],
         [4, "3131", "listening"], [5, "323231132", "listening"],
+      ]
+    ),
+  },
+  {
+    id: "n3-2012-12", level: "N3", year: 2012, month: 12, pages: 13, listeningPage: 11,
+    notes: [],
+    parts: N3_PARTS(
+      [
+        [1, "23421314", "vocab"], [2, "421341", "vocab"], [3, "13344213122", "vocab"],
+        [4, "23431", "vocab"], [5, "34122", "vocab"],
+      ],
+      [
+        [1, "4412212331321", "grammar"], [2, "23314", "grammar"], [3, "42431", "grammar"],
+        [4, "2123", "reading"], [5, "124334", "reading"], [6, "1133", "reading"], [7, "23", "reading"],
+      ],
+      [
+        [1, "443312", "listening"], [2, "113124", "listening"], [3, "331", "listening"],
+        [4, "3312", "listening"], [5, "122312332", "listening"],
+      ]
+    ),
+  },
+  {
+    id: "n3-2012-07", level: "N3", year: 2012, month: 7, pages: 13, listeningPage: 12,
+    notes: [],
+    parts: N3_PARTS(
+      [
+        [1, "14132424", "vocab"], [2, "343213", "vocab"], [3, "14321423242", "vocab"],
+        [4, "42313", "vocab"], [5, "42113", "vocab"],
+      ],
+      [
+        [1, "4122134214233", "grammar"], [2, "21423", "grammar"], [3, "43124", "grammar"],
+        [4, "3334", "reading"], [5, "322422", "reading"], [6, "4111", "reading"], [7, "12", "reading"],
+      ],
+      [
+        [1, "434131", "listening"], [2, "443414", "listening"], [3, "331", "listening"],
+        [4, "1231", "listening"], [5, "321122113", "listening"],
+      ]
+    ),
+  },
+  {
+    id: "n3-2011-12", level: "N3", year: 2011, month: 12, pages: 13, listeningPage: 12,
+    notes: [],
+    parts: N3_PARTS(
+      [
+        [1, "32234124", "vocab"], [2, "344123", "vocab"], [3, "24231224121", "vocab"],
+        [4, "44232", "vocab"], [5, "42114", "vocab"],
+      ],
+      [
+        [1, "1324222134332", "grammar"], [2, "44341", "grammar"], [3, "12413", "grammar"],
+        [4, "3411", "reading"], [5, "214424", "reading"], [6, "2342", "reading"], [7, "22", "reading"],
+      ],
+      [
+        [1, "343311", "listening"], [2, "241324", "listening"], [3, "233", "listening"],
+        [4, "3123", "listening"], [5, "22132312", "listening"],
+      ]
+    ),
+  },
+  {
+    id: "n3-2011-07", level: "N3", year: 2011, month: 7, pages: 13, listeningPage: 12,
+    notes: [],
+    parts: N3_PARTS(
+      [
+        [1, "32231424", "vocab"], [2, "341223", "vocab"], [3, "24331123421", "vocab"],
+        [4, "14323", "vocab"], [5, "41411", "vocab"],
+      ],
+      [
+        [1, "2243412344231", "grammar"], [2, "24213", "grammar"], [3, "34321", "grammar"],
+        [4, "3334", "reading"], [5, "341321", "reading"], [6, "1442", "reading"], [7, "23", "reading"],
+      ],
+      [
+        [1, "241232", "listening"], [2, "314244", "listening"], [3, "224", "listening"],
+        [4, "2321", "listening"], [5, "31322132", "listening"],
       ]
     ),
   },
