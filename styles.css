@@ -530,8 +530,8 @@ kbd { font: 11px/1 ui-monospace, monospace; padding: 2px 5px; border: 1px solid 
 .hist-row:hover .hr-type { color: var(--accent); }
 @media (max-width: 520px) { .hist-row { grid-template-columns: 1fr auto auto; } .hr-date { grid-column: 1 / -1; font-size: 12px; } }
 
-/* custom question count in the drill setup */
-.ds-custom { display: inline-flex; align-items: center; gap: 8px; margin-left: 12px; color: var(--muted); font-size: 13px; }
-.ds-custom input { width: 5.5em; padding: 7px 10px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; }
+/* custom question count in the drill setup: its own row under the 10 / All buttons, no spinner arrows */
+.ds-custom { display: flex; flex-basis: 100%; align-items: center; gap: 8px; margin: -4px 0 0; color: var(--muted); font-size: 13px; }
+.ds-custom input { width: 7em; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; -moz-appearance: textfield; appearance: textfield; }
+.ds-custom input::-webkit-outer-spin-button, .ds-custom input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .ds-custom.active input { border-color: var(--accent); }
-@media (max-width: 520px) { .ds-custom { margin-left: 0; } }
