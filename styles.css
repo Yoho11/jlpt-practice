@@ -513,3 +513,11 @@ kbd { font: 11px/1 ui-monospace, monospace; padding: 2px 5px; border: 1px solid 
 /* questions whose key digit is uncertain */
 .dispute { margin-top: 8px; padding: 10px 12px; border-radius: 10px; background: var(--warn-soft); color: var(--warn); font-size: 13px; line-height: 1.5; }
 .c-tag.sug { background: var(--warn-soft); color: var(--warn); }
+
+/* question-by-type: keep the Next button on screen while reading a long explanation */
+.drill .q-foot { position: sticky; bottom: 0; z-index: 5; margin: 22px -24px -22px; padding: 12px 24px calc(12px + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius); }
+@media (max-width: 700px) {
+  .drill .q-foot { margin: 22px -16px -16px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  .drill .kbd-hint { display: none; }
+  .drill .q-foot .btn { width: 100%; justify-content: center; }
+}
