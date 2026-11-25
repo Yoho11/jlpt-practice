@@ -414,6 +414,7 @@
           <div class="drill-progress"><i style="width:${(done / items.length) * 100}%"></i></div>
           <span class="drill-count">${i + 1} / ${items.length}</span>
           <span class="drill-right">✓ ${right}</span>
+          <button class="btn ghost small" data-finish ${done ? "" : "disabled"} title="End now and save the questions you have answered">Finish</button>
         </div>
         <div class="q-layout ${passage ? "with-passage" : ""}">
           ${passage}
@@ -453,6 +454,15 @@
       if (i < items.length - 1) { i++; question(); } else summary();
     }
 
+    // end early: keep only the questions answered so far, then score and save them like a full set
+    function finishEarly() {
+      if (phase !== "q") return;
+      const keep = items.map((it, k) => k).filter((k) => picks[k] != null);
+      if (!keep.length) return;
+      const np = {}; keep.forEach((k, j) => { np[j] = picks[k]; });
+      items = keep.map((k) => items[k]); picks = np;
+      summary();
+    }
     function summary() {
       phase = "done";
       const c = items.filter((it, k) => picks[k] === it.q.answer).length, n = items.length, p = Math.round((c / n) * 100);
@@ -487,6 +497,7 @@
 
     const onClick = (e) => {
       const c = e.target.closest(".choice"); if (c && !c.disabled) return pick(Number(c.dataset.c));
+      if (e.target.closest("[data-finish]")) { const b = e.target.closest("[data-finish]"); if (!b.disabled) finishEarly(); return; }
       if (e.target.closest("[data-next]")) next();
       else if (e.target.closest("[data-prev]")) prev();
     };

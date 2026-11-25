@@ -535,3 +535,6 @@ kbd { font: 11px/1 ui-monospace, monospace; padding: 2px 5px; border: 1px solid 
 .ds-custom input { width: 7em; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; -moz-appearance: textfield; appearance: textfield; }
 .ds-custom input::-webkit-outer-spin-button, .ds-custom input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .ds-custom.active input { border-color: var(--accent); }
+
+.drill-bar [data-finish] { padding: 5px 12px; font-size: 13px; white-space: nowrap; }
+.drill-bar [data-finish]:disabled { opacity: .4; cursor: default; }
